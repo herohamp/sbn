@@ -1,3 +1,5 @@
+import {rawElements} from "./elements.js"
+
 export function transformer (ast) {
 
   function makeColor (level) {
@@ -15,34 +17,34 @@ export function transformer (ast) {
     return p.value
   }
 
-  var elements = {
-    'Line' : function (param, pen_color_value) {
-      return {
-        tag: 'line',
-        attr: {
-          x1: findParamValue(param[0]),
-          y1: 100 - findParamValue(param[1]),
-          x2: findParamValue(param[2]),
-          y2: 100 - findParamValue(param[3]),
-          stroke: makeColor(pen_color_value),
-          'stroke-linecap': 'round'
-        },
-        body: []
-      }
-    },
-    'Paper' : function (param) {
-      return {
-        tag : 'rect',
-        attr : {
-          x: 0,
-          y: 0,
-          width: 100,
-          height:100,
-          fill: makeColor(findParamValue(param[0]))
-        },
-        body : []
+  function runElement (name, param, pen_color_value){
+    let e = rawElements[name];
+    if (!e){
+      throw name + " is not a valid command"
+    }
+    let element = {
+      tag: e.tag,
+      attr: {
+
+      },
+      body: []
+    }
+
+    let attrID = 0;
+    for (let attri in e.attr){
+      let attr = e.attr[attri];
+      if (attr == "stroke"){
+        element.attr[attr] = makeColor(pen_color_value);
+      } else if (typeof attr == "string"){
+        element.attr[attr] = findParamValue(param[attrID]);
+        attrID++;
+      } else if (typeof attr == "object"){
+        Object.assign(element.attr, attr);
       }
     }
+
+    return element;
+
   }
 
   var newAST = {
@@ -70,15 +72,7 @@ export function transformer (ast) {
       } else if (node.name === 'Set') {
         variables[node.identifier.value] = node.value.value
       } else {
-        var el = elements[node.name]
-        if (!el) {
-          throw node.name + ' is not a valid command.'
-        }
-        if (typeof !current_pen_color === 'undefined') {
-          // throw 'Please define Pen before drawing Line.'
-          // TODO : message 'You should define Pen before drawing Line'
-        }
-        newAST.body.push(el(node.arguments, current_pen_color))
+        newAST.body.push(runElement(node.name, node.arguments, current_pen_color))
       }
     }
   }

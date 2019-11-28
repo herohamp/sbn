@@ -1,15 +1,17 @@
-# sbn
+# sbn++
 
-A compiler for small drawing language sbn(SVG by Numbers). Inspired by John Maeda's book: Design by Numbers.
+A fork of sbn to continue adding features, which is a compiler for small drawing language sbn(SVG by Numbers). Inspired by John Maeda's book: Design by Numbers. It is not interoperable with SBN as the cordinate system on the Y axis is flipped.
 
 ## Supported Keywords
-This compiler is work-in-progress. Here is a list of commands currently supported (v0.4.3) & planning to implement. (sbn language specification is compatible with Design by Numbers chapter 1 - 12)
+This compiler is work-in-progress. Here is a list of commands currently supported (v1.0.1) & planning to implement
 - [x] `Paper`
 - [x] `Pen`
 - [x] `Line`
+- [x] `Rect`
 - [x] `// comment`
 - [x] `Set` (variable)
 - [x] `{ }` (block)
+- [] `Fill`
 - [ ] Nested block
 - [ ] `Repeat`
 - [ ] `(+ - / *)` (calculations)
@@ -38,7 +40,7 @@ document.body.innerHTML = svg
 You can run sbn compiler on node to create SVG file.
 ```javascript
 var fs = require('fs')
-var sbn = require('sbn')
+var sbn = require('sbnp')
 
 var code = `
   Paper 95

@@ -163,12 +163,10 @@ export function parser (tokens) {
           break
         case 'Line':
           if(!paper) {
-            // throw 'Please make Paper 1st'
-            // TODO : no error message 'You should make paper first'
+            throw 'You should make paper before invoking Line'
           }
           if(!pen) {
-            // throw 'Please define Pen 1st'
-            // TODO : no error message 'You should set pen color first'
+            throw 'Please define Pen before invoking Line'
           }
           var expression = {
             type: 'CallExpression',
@@ -176,6 +174,38 @@ export function parser (tokens) {
             arguments: []
           }
           var args = findArguments('Line', 4)
+          expression.arguments = expression.arguments.concat(args)
+          AST.body.push(expression)
+          break
+        case 'Circle':
+          if(!paper) {
+            throw 'You should make paper before invoking Circle'
+          }
+          if(!pen) {
+            throw 'Please define Pen before invoking Circle'
+          }
+          var expression = {
+            type: 'CallExpression',
+            name: 'Circle',
+            arguments: []
+          }
+          var args = findArguments('Circle', 3)
+          expression.arguments = expression.arguments.concat(args)
+          AST.body.push(expression)
+          break
+        case 'Rect':
+          if(!paper) {
+            throw 'You should make paper before invoking Rect'
+          }
+          if(!pen) {
+            throw 'Please define Pen before invoking Rect'
+          }
+          var expression = {
+            type: 'CallExpression',
+            name: 'Rect',
+            arguments: []
+          }
+          var args = findArguments('Rect', 4)
           expression.arguments = expression.arguments.concat(args)
           AST.body.push(expression)
           break
