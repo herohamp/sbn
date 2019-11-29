@@ -198,7 +198,7 @@ function parser(tokens) {
                 expression.arguments = expression.arguments.concat(args);
                 AST.body.push(expression);
             } else if (current_token.value == 'Set') {
-                var args = findArguments('Set', 2, [['word', 'ob'], 'number']);
+                var args = findArguments('Set', 2, [['word', 'ob'], ['number', 'word']]);
                 var obj = {};
                 if (args[0].type === 'dot') {
                     AST.body.push({
