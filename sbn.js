@@ -89,8 +89,8 @@ function parser(tokens) {
                 if (!expected) {
                     throw command + ' takes ' + JSON.stringify(expectedType[currentPosition]) + ' as argument ' + (currentPosition + 1) + '. ' + (token ? 'Instead found a ' + token.type + ' ' + (token.value || '') + '.' : '')
                 }
-                if (token.type === 'number' && (token.value < 0 || token.value > 100)) {
-                    throw 'Found value ' + token.value + ' for ' + command + '. Value must be between 0 - 100.'
+                if (token.type === 'number' && (token.value < 0 || token.value > 16777215)) {
+                    throw 'Found value ' + token.value + ' for ' + command + '. Value must be between 0 - 16777215.'
                 }
             }
 
@@ -117,123 +117,163 @@ function parser(tokens) {
     while (tokens.length > 0) {
         var current_token = tokens.shift();
         if (current_token.type === 'word') {
-            switch (current_token.value) {
-                case '//' :
-                    var expression = {
-                        type: 'CommentExpression',
-                        value: ''
-                    };
-                    var next = tokens.shift();
-                    while (next.type !== 'newline') {
-                        expression.value += next.value + ' ';
-                        next = tokens.shift();
-                    }
-                    AST.body.push(expression);
-                    break
+            if (current_token.value == '//') {
+                var expression = {
+                    type: 'CommentExpression',
+                    value: ''
+                };
+                var next = tokens.shift();
+                while (next.type !== 'newline') {
+                    expression.value += next.value + ' ';
+                    next = tokens.shift();
+                }
+                AST.body.push(expression);
+            } else if (current_token.value == 'Paper') {
 
-                case 'Paper' :
-                    if (paper) {
-                        throw 'You can not define Paper more than once'
-                    }
-                    var expression = {
-                        type: 'CallExpression',
-                        name: 'Paper',
-                        arguments: []
-                    };
-                    var args = findArguments('Paper', 1);
-                    expression.arguments = expression.arguments.concat(args);
-                    AST.body.push(expression);
-                    paper = true;
-                    break
-                case 'Pen' :
-                    var expression = {
+                if (paper) {
+                    throw 'You can not define Paper more than once'
+                }
+                var expression = {
+                    type: 'CallExpression',
+                    name: 'Paper',
+                    arguments: []
+                };
+                var args = findArguments('Paper', 1);
+                expression.arguments = expression.arguments.concat(args);
+                AST.body.push(expression);
+                paper = true;
+            } else if (current_token.value == 'Pen') {
+                var expression = {
+                    type: 'CallExpression',
+                    name: 'Pen',
+                    arguments: []
+                };
+                var args = findArguments('Pen', 1);
+                expression.arguments = expression.arguments.concat(args);
+                AST.body.push(expression);
+                pen = true;
+            } else if (current_token.value == 'Line') {
+                if (!paper) {
+                    throw 'You should make paper before invoking Line'
+                }
+                if (!pen) {
+                    throw 'Please define Pen before invoking Line'
+                }
+                var expression = {
+                    type: 'CallExpression',
+                    name: 'Line',
+                    arguments: []
+                };
+                var args = findArguments('Line', 4);
+                expression.arguments = expression.arguments.concat(args);
+                AST.body.push(expression);
+            } else if (current_token.value == 'Circle') {
+                if (!paper) {
+                    throw 'You should make paper before invoking Circle'
+                }
+                if (!pen) {
+                    throw 'Please define Pen before invoking Circle'
+                }
+                var expression = {
+                    type: 'CallExpression',
+                    name: 'Circle',
+                    arguments: []
+                };
+                var args = findArguments('Circle', 3);
+                expression.arguments = expression.arguments.concat(args);
+                AST.body.push(expression);
+            } else if (current_token.value == 'Rect') {
+                if (!paper) {
+                    throw 'You should make paper before invoking Rect'
+                }
+                if (!pen) {
+                    throw 'Please define Pen before invoking Rect'
+                }
+                var expression = {
+                    type: 'CallExpression',
+                    name: 'Rect',
+                    arguments: []
+                };
+                var args = findArguments('Rect', 4);
+                expression.arguments = expression.arguments.concat(args);
+                AST.body.push(expression);
+            } else if (current_token.value == 'Set') {
+                var args = findArguments('Set', 2, [['word', 'ob'], 'number']);
+                var obj = {};
+                if (args[0].type === 'dot') {
+                    AST.body.push({
                         type: 'CallExpression',
                         name: 'Pen',
-                        arguments: []
-                    };
-                    var args = findArguments('Pen', 1);
-                    expression.arguments = expression.arguments.concat(args);
-                    AST.body.push(expression);
-                    pen = true;
-                    break
-                case 'Line':
-                    if (!paper) {
-                        throw 'You should make paper before invoking Line'
-                    }
-                    if (!pen) {
-                        throw 'Please define Pen before invoking Line'
-                    }
-                    var expression = {
-                        type: 'CallExpression',
-                        name: 'Line',
-                        arguments: []
-                    };
-                    var args = findArguments('Line', 4);
-                    expression.arguments = expression.arguments.concat(args);
-                    AST.body.push(expression);
-                    break
-                case 'Circle':
-                    if (!paper) {
-                        throw 'You should make paper before invoking Circle'
-                    }
-                    if (!pen) {
-                        throw 'Please define Pen before invoking Circle'
-                    }
-                    var expression = {
-                        type: 'CallExpression',
-                        name: 'Circle',
-                        arguments: []
-                    };
-                    var args = findArguments('Circle', 3);
-                    expression.arguments = expression.arguments.concat(args);
-                    AST.body.push(expression);
-                    break
-                case 'Rect':
-                    if (!paper) {
-                        throw 'You should make paper before invoking Rect'
-                    }
-                    if (!pen) {
-                        throw 'Please define Pen before invoking Rect'
-                    }
-                    var expression = {
-                        type: 'CallExpression',
-                        name: 'Rect',
-                        arguments: []
-                    };
-                    var args = findArguments('Rect', 4);
-                    expression.arguments = expression.arguments.concat(args);
-                    AST.body.push(expression);
-                    break
+                        arguments: [args[1]]
+                    });
+                    obj.type = 'CallExpression',
+                        obj.name = 'Line',
+                        obj.arguments = [
+                            {type: 'number', value: args[0].x},
+                            {type: 'number', value: args[0].y},
+                            {type: 'number', value: args[0].x},
+                            {type: 'number', value: args[0].y}
+                        ];
+                } else {
+                    obj.type = 'VariableDeclaration';
+                    obj.name = 'Set';
+                    obj.identifier = args[0];
+                    obj.value = args[1];
+                }
 
-                case 'Set':
-                    var args = findArguments('Set', 2, [['word', 'ob'], 'number']);
-                    var obj = {};
-                    if (args[0].type === 'dot') {
-                        AST.body.push({
-                            type: 'CallExpression',
-                            name: 'Pen',
-                            arguments: [args[1]]
-                        });
-                        obj.type = 'CallExpression',
-                            obj.name = 'Line',
-                            obj.arguments = [
-                                {type: 'number', value: args[0].x},
-                                {type: 'number', value: args[0].y},
-                                {type: 'number', value: args[0].x},
-                                {type: 'number', value: args[0].y}
-                            ];
-                    } else {
-                        obj.type = 'VariableDeclaration';
-                        obj.name = 'Set';
-                        obj.identifier = args[0];
-                        obj.value = args[1];
-                    }
+                AST.body.push(obj);
+            } else if (current_token.value == 'SetMod') {
+                var args = findArguments('SetMode', 4, ['word', ['word', 'number'], 'word', ['word', 'number']]);
+                var obj = {};
+                obj.type = 'VariableDeclaration';
+                obj.name = 'Set';
+                obj.identifier = args[0];
+                let opperand1 = args[1];
+                let opperand2 = args[3];
 
-                    AST.body.push(obj);
-                    break
-                default:
-                    throw current_token.value + ' is not a valid command'
+                if (opperand1.type == "word") {
+                    let object = AST.body.find(object => object.type == 'VariableDeclaration' && object.identifier.value == opperand1.value);
+                    if (!object){
+                        throw "Variable " + opperand1.value + " is not defined"
+                    }
+                    opperand1.value = Number(object.value.value);
+                }
+
+                if (opperand2.type == "word") {
+                    let object = AST.body.find(object => object.type == 'VariableDeclaration' && object.identifier.value == opperand2.value);
+                    if (!object){
+                        throw "Variable " + opperand2.value + " is not defined"
+                    }
+                    opperand2.value = Number(object.value.value);
+                }
+
+                let finalVal = 0;
+                switch (args[2].value) {
+                    case "sub":
+                    case "-":
+                        finalVal = Number(opperand1.value) - Number(opperand2.value);
+                        break;
+                    case "add":
+                    case "+":
+                        finalVal = Number(opperand1.value) + Number(opperand2.value);
+                        break;
+                    case "mult":
+                    case "*":
+                        finalVal = Number(opperand1.value) * Number(opperand2.value);
+                        break;
+                    case "div":
+                    case "/":
+                        finalVal = Number(opperand1.value) / Number(opperand2.value);
+                        break;
+                }
+
+
+                console.log(obj);
+                obj.value = {type: 'number', value: finalVal};
+
+                AST.body.push(obj);
             }
+
         } else {
             switch (current_token.type) {
                 case 'ocb' :
@@ -289,7 +329,8 @@ const rawElements = {
             'width',
             'height',
             'stroke',
-            {'stroke-linecap': 'round'}
+            {'stroke-linecap': 'round'},
+            {'fill': 'transparent'}
         ],
         body: []
     },
@@ -304,7 +345,8 @@ const rawElements = {
             'cy',
             'r',
             'stroke',
-            {'stroke-linecap': 'round'}
+            {'stroke-linecap': 'round'},
+            {'fill': 'transparent'}
         ],
         body: []
     },
@@ -324,12 +366,13 @@ const rawElements = {
 
 function transformer(ast) {
 
-    function makeColor(level) {
-        if (typeof level === 'undefined') {
-            level = 100;
-        }
-        level = 100 - parseInt(level, 10); // flip
-        return 'rgb(' + level + '%, ' + level + '%, ' + level + '%)'
+    function makeColor(num) {
+        var bin = (num >>> 0).toString(2).padStart(24, "0");
+        var pbin = parseInt(bin, 2);
+        var r = pbin >> 16;
+        var g = pbin >> 8 & 0xFF;
+        var b = pbin & 0xFF;
+        return 'rgb(' + r + '%, ' + g + '%, ' + b + '%)'
     }
 
     function findParamValue(p) {
@@ -354,8 +397,12 @@ function transformer(ast) {
         for (let attri in e.attr) {
             let attr = e.attr[attri];
             if (attr == "stroke") {
+                console.log(pen_color_value);
                 element.attr[attr] = makeColor(pen_color_value);
-            } else if (typeof attr == "string") {
+            } else if (attr == "fill"){
+                element.attr[attr] = makeColor(findParamValue(param[attrID]));
+            }
+            else if (typeof attr == "string") {
                 element.attr[attr] = findParamValue(param[attrID]);
                 attrID++;
             } else if (typeof attr == "object") {
@@ -380,7 +427,6 @@ function transformer(ast) {
     };
 
     var current_pen_color;
-    // TODO : warning when paper and pen is same color
 
     var variables = {};
 
@@ -450,7 +496,7 @@ function generator(ast) {
 
 var SBN = {};
 
-SBN.VERSION = '1.0.1';
+SBN.VERSION = '1.0.2';
 SBN.lexer = lexer;
 SBN.parser = parser;
 SBN.transformer = transformer;

@@ -4,11 +4,13 @@
   "description": "A compiler for small drawing language sbn(SVG by Numbers). Inspired by John Maeda's book: Design by Numbers.",
   "main": "sbn.js",
   "scripts": {
-    "build": "rollup ./src/compiler.js  -n sbn -f umd -o sbn.js"
+    "build": "rollup  ./src/compiler.js  -n sbn -f umd -o sbn.js",
+    "watch": "rollup ./src/compiler.js --watch -n sbn -f umd -o sbn.js"
   },
-  "author": "Hampton Moore (http://twitter.com/kosamari)",
+  "author": "Hampton Moore (https://hampton.pw)",
   "license": "Apache-2.0",
   "devDependencies": {
-    "rollup": "^0.36.1"
+    "rollup": "^0.36.1",
+    "rollup-watch": "^4.3.1"
   }
 }

@@ -27,7 +27,8 @@ export const rawElements = {
             'width',
             'height',
             'stroke',
-            {'stroke-linecap': 'round'}
+            {'stroke-linecap': 'round'},
+            {'fill': 'transparent'}
         ],
         body: []
     },
@@ -42,7 +43,8 @@ export const rawElements = {
             'cy',
             'r',
             'stroke',
-            {'stroke-linecap': 'round'}
+            {'stroke-linecap': 'round'},
+            {'fill': 'transparent'}
         ],
         body: []
     },

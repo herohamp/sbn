@@ -2,12 +2,13 @@ import {rawElements} from "./elements.js"
 
 export function transformer(ast) {
 
-    function makeColor(level) {
-        if (typeof level === 'undefined') {
-            level = 100
-        }
-        level = 100 - parseInt(level, 10) // flip
-        return 'rgb(' + level + '%, ' + level + '%, ' + level + '%)'
+    function makeColor(num) {
+        var bin = (num >>> 0).toString(2).padStart(24, "0")
+        var pbin = parseInt(bin, 2);
+        var r = pbin >> 16;
+        var g = pbin >> 8 & 0xFF;
+        var b = pbin & 0xFF;
+        return 'rgb(' + r + '%, ' + g + '%, ' + b + '%)'
     }
 
     function findParamValue(p) {
@@ -32,8 +33,12 @@ export function transformer(ast) {
         for (let attri in e.attr) {
             let attr = e.attr[attri];
             if (attr == "stroke") {
+                console.log(pen_color_value);
                 element.attr[attr] = makeColor(pen_color_value);
-            } else if (typeof attr == "string") {
+            } else if (attr == "fill"){
+                element.attr[attr] = makeColor(findParamValue(param[attrID]));
+            }
+            else if (typeof attr == "string") {
                 element.attr[attr] = findParamValue(param[attrID]);
                 attrID++;
             } else if (typeof attr == "object") {

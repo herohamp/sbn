@@ -4,7 +4,7 @@ import {generator} from './generator.js';
 
 var SBN = {}
 
-SBN.VERSION = '1.0.1'
+SBN.VERSION = '1.0.2'
 SBN.lexer = lexer
 SBN.parser = parser
 SBN.transformer = transformer
