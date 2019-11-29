@@ -367,16 +367,11 @@ const rawElements = {
 function transformer(ast) {
 
     function makeColor(num) {
-        var bin = (num >>> 0).toString(2).padStart(24, "0");
-        var pbin = parseInt(bin, 2);
-        var r = pbin >> 16;
-        var g = pbin >> 8 & 0xFF;
-        var b = pbin & 0xFF;
-        return 'rgb(' + r + '%, ' + g + '%, ' + b + '%)'
+        return num.substring(1);
     }
 
     function findParamValue(p) {
-        if (p.type === 'word') {
+        if (p.type === 'word' && p.value.charAt(0) != "!") {
             return variables[p.value]
         }
         return p.value
@@ -397,9 +392,9 @@ function transformer(ast) {
         for (let attri in e.attr) {
             let attr = e.attr[attri];
             if (attr == "stroke") {
-                console.log(pen_color_value);
                 element.attr[attr] = makeColor(pen_color_value);
             } else if (attr == "fill"){
+                console.log(param[attrID]);
                 element.attr[attr] = makeColor(findParamValue(param[attrID]));
             }
             else if (typeof attr == "string") {
