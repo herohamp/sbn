@@ -2,6 +2,9 @@ export const rawElements = {
     'Line': {
         tag: 'line',
         attrs: 4,
+        reqs: [
+            "Paper", "Pen"
+        ],
         attr: [
             'x1',
             'y1',
@@ -15,6 +18,9 @@ export const rawElements = {
     'Rect': {
         tag: 'rect',
         attrs: 4,
+        reqs: [
+            "Paper", "Pen"
+        ],
         attr: [
             'x',
             'y',
@@ -28,6 +34,9 @@ export const rawElements = {
     'Circle': {
         tag: 'circle',
         attrs: 3,
+        reqs: [
+            "Paper", "Pen"
+        ],
         attr: [
             'cx',
             'cy',
